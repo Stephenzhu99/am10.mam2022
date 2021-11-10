@@ -9,6 +9,8 @@ output:
     number_sections: true
     toc: yes
     toc_float: yes
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -67,7 +69,8 @@ emperors <- vroom(url)
 
 
 emperor_killers <- emperors %>%
-  count(killer) 
+  count(killer) %>% 
+  arrange(n)
 
 #if you want to use hex codes, gplots::col2hex("colour name") will give you hex code
 # grey70 = #B3B3B3, tomato = #FF6347
@@ -82,13 +85,13 @@ my_colours <- c("grey70", "tomato")
 
 emperor_killers %>% 
   mutate(
-    ___________ = ifelse(killer == "___________", TRUE, FALSE),
+    enemy = ifelse(killer == "Other Emperor" | killer == 'Opposing Army', TRUE, FALSE),
     # use `fct_inorder()` to maintain the way we sorted the data
     killer = fct_inorder(killer)
   ) %>%
-  ggplot(aes(x = n, y = killer, fill = ___________)) +
+  ggplot(aes(x = n, y = killer, fill = enemy)) +
   geom_col() +
-  scale_fill_manual(values = my_colours)+
+  scale_fill_manual(values = my_colours) +
   geom_text(
     aes(label = n, x = n - .25), 
     color = "white", 
@@ -100,8 +103,9 @@ emperor_killers %>%
     axis.title.y = element_blank(), 
     legend.position = "none" 
   ) +
-  ___________(values = ___________) +
-  xlab("number of emperors")
+  scale_fill_manual(values = my_colours) +
+  xlab("number of emperors") +
+  NULL
 ```
 
 
@@ -148,7 +152,7 @@ gapminder %>%
 gapminder %>%
   filter(year == 2007) %>%
   mutate(
-    label = ifelse(______  %in% _____, as.character(country), _____________ )
+    label = ifelse(country  %in% some_countries, as.character(country), "" )
   ) %>%
   ggplot(aes(log(gdpPercap), lifeExp)) +
     geom_point(
@@ -168,7 +172,8 @@ gapminder %>%
     title = "Gapminder 2007: Life expectancy vs GDP per capita",
     x = "log(GDP per capita)",
     y = "Life Expectancy"
-  )
+  ) +
+  NULL
 ```
 
 
@@ -195,6 +200,8 @@ pdens1 <- ggplot(titanic, aes(x = age)) +
     plot.margin = margin(3, 1.5, 3, 1.5)
   )
 
+pdens1
+
 pdens2 <- ggplot(titanic, aes(x = age)) + 
  geom_density(fill = "#56B4E9", color = "#56B4E9", bw = 2, kernel = "gaussian") + 
   scale_y_continuous(limits = c(0, 0.046), expand = c(0, 0), name = "density") +
@@ -205,6 +212,8 @@ pdens2 <- ggplot(titanic, aes(x = age)) +
     axis.line.x = element_blank(),
     plot.margin = margin(3, 1.5, 3, 1.5)
   )
+
+pdens2
 
 pdens3 <- ggplot(titanic, aes(x = age)) + 
  geom_density(fill = "#56B4E9", color = "#56B4E9", bw = 5, kernel = "gaussian") + 
@@ -217,6 +226,8 @@ pdens3 <- ggplot(titanic, aes(x = age)) +
     plot.margin = margin(3, 1.5, 3, 1.5)
   )
 
+pdens3
+
 pdens4 <- ggplot(titanic, aes(x = age)) + 
   geom_density(fill = "#56B4E9", color = "#56B4E9", bw = 2, kernel = "rectangular") + 
   scale_y_continuous(limits = c(0, 0.046), expand = c(0, 0), name = "density") +
@@ -227,6 +238,8 @@ pdens4 <- ggplot(titanic, aes(x = age)) +
     axis.line.x = element_blank(),
     plot.margin = margin(3, 1.5, 3, 1.5)
   )
+
+pdens4
 
 # use patchwork to arrange plots
 (pdens1 + pdens2) / (pdens3 + pdens4) 
@@ -313,7 +326,7 @@ titanic %>%
 
 # `gghighlight`
 
-We want to create a graph that looks at African countriews were life expectancy between 1992 and 2007 went down.
+We want to create a graph that looks at African countries where life expectancy between 1992 and 2007 went down.
 
 ```{r}
 africa <- gapminder %>%
@@ -348,7 +361,7 @@ le_line_plot <- africa %>%
 
   theme(
     # remove legend using the legend.position argument in theme()
-    # ________________,
+    legend.position = 'none',
     panel.grid.major.x = element_blank(),
     panel.grid.minor = element_blank()
   ) +
